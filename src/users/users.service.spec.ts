@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -32,14 +36,12 @@ describe('UsersService', () => {
 
   const mockAdmin: AuthenticatedUser = {
     id: 2,
-    userId: 2,
     email: 'admin@example.com',
     role: 'admin',
   };
 
   const mockUserAuth: AuthenticatedUser = {
     id: 1,
-    userId: 1,
     email: 'test@example.com',
     role: 'user',
   };

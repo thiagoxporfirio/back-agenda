@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,6 +20,15 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+    // Verificar se o email já existe
+    const existingUser = await this.usersRepository.findOneBy({
+      email: createUserDto.email,
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Email já está em uso');
+    }
+
     const hash = await bcrypt.hash(createUserDto.password, 10);
     const user = this.usersRepository.create({
       ...createUserDto,
@@ -26,18 +36,21 @@ export class UsersService {
       role: createUserDto.role || 'user',
     });
     const saved = await this.usersRepository.save(user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = saved;
     return result;
   }
 
   async findAll(): Promise<Omit<User, 'password'>[]> {
     const users = await this.usersRepository.find();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return users.map(({ password, ...rest }) => rest);
   }
 
   async findOne(id: number): Promise<Omit<User, 'password'> | undefined> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('Usuário não encontrado');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;
     return result;
   }
@@ -51,12 +64,12 @@ export class UsersService {
     id: number,
     dto: UpdateUserDto,
     currentUser: AuthenticatedUser,
-  ): Promise<Omit<User, 'password'>> {
+  ): Promise<Partial<User>> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (currentUser.role !== 'admin' && currentUser.userId !== id) {
+    if (currentUser.role !== 'admin' && currentUser.id !== id) {
       throw new ForbiddenException();
     }
     if (dto.password) {
@@ -64,6 +77,7 @@ export class UsersService {
     }
     Object.assign(user, dto);
     const saved = await this.usersRepository.save(user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = saved;
     return result;
   }
@@ -73,7 +87,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (currentUser.role !== 'admin' && currentUser.userId !== id) {
+    if (currentUser.role !== 'admin' && currentUser.id !== id) {
       throw new ForbiddenException();
     }
     await this.usersRepository.delete(id);

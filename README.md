@@ -109,6 +109,45 @@ Após executar a aplicação, acesse:
 - **Swagger UI**: http://localhost:3000/swagger
 - **API Base**: http://localhost:3000
 
+### 📋 Schemas Atualizados
+
+#### AuthenticatedUser (Simplificado)
+
+```typescript
+{
+  "id": 1,                    // ✅ ID único do usuário
+  "email": "user@email.com",  // ✅ Email do usuário
+  "role": "user"              // ✅ Papel (user/admin)
+}
+```
+
+#### LoginResponse
+
+```typescript
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "email": "user@email.com",
+    "role": "user"
+  }
+}
+```
+
+#### Booking (PostgreSQL Compatível)
+
+```typescript
+{
+  "id": 1,
+  "courtId": 1,
+  "startTime": "2024-07-20T10:00:00.000Z",  // ✅ timestamp
+  "endTime": "2024-07-20T11:00:00.000Z",    // ✅ timestamp
+  "duration": 1.0,                          // ✅ decimal (0.5, 1.0, 1.5...)
+  "status": "confirmed",
+  "notes": "Reserva para treinamento"
+}
+```
+
 ## 🔗 Endpoints Principais
 
 ### Usuários
@@ -218,6 +257,8 @@ Para problemas ou dúvidas, verifique:
 - 📊 **Cobertura de Testes**: Mantida alta cobertura (88.19%) com 179 testes
 - 🔍 **PostgreSQL**: Compatibilidade total com tipos timestamp
 - ✨ **Código Limpo**: Interface simplificada e código mais maintível
+- 📚 **Swagger Atualizado**: Schemas de API atualizados com a nova estrutura de dados
+- 🏷️ **DTOs Aprimorados**: Criados novos DTOs para respostas (AuthenticatedUserDto, LoginResponseDto, UserResponseDto)
 
 ### Estrutura de Dados Atualizada
 

@@ -2,6 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from '../users/dto/login-user.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -32,13 +33,29 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Login realizado com sucesso',
-    example: {
-      access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-      user: {
-        id: 1,
-        name: 'João Silva',
-        email: 'joao@email.com',
-        role: 'user',
+    type: LoginResponseDto,
+    examples: {
+      success: {
+        summary: 'Login de usuário comum',
+        value: {
+          access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          user: {
+            id: 1,
+            email: 'joao@email.com',
+            role: 'user',
+          },
+        },
+      },
+      admin: {
+        summary: 'Login de administrador',
+        value: {
+          access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          user: {
+            id: 2,
+            email: 'admin@email.com',
+            role: 'admin',
+          },
+        },
       },
     },
   })

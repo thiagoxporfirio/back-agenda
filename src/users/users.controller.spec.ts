@@ -21,14 +21,12 @@ describe('UsersController', () => {
 
   const mockAdmin: AuthenticatedUser = {
     id: 2,
-    userId: 2,
     email: 'admin@example.com',
     role: 'admin',
   };
 
   const mockUserAuth: AuthenticatedUser = {
     id: 1,
-    userId: 1,
     email: 'test@example.com',
     role: 'user',
   };

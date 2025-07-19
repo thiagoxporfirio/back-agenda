@@ -11,9 +11,15 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Back Agenda API')
-    .setDescription('Documentação da API Back Agenda')
-    .setVersion('1.0')
+    .setDescription(
+      'API para sistema de agendamento de quadras esportivas com autenticação JWT e controle de conflitos de horários',
+    )
+    .setVersion('1.1.0')
     .addBearerAuth()
+    .addTag('auth', 'Endpoints de autenticação')
+    .addTag('users', 'Gestão de usuários')
+    .addTag('courts', 'Gestão de quadras')
+    .addTag('bookings', 'Gestão de agendamentos')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
