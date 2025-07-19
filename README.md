@@ -106,15 +106,19 @@ npm run test:e2e
 
 Após executar a aplicação, acesse:
 
-- **Swagger UI**: http://localhost:3000/api
+- **Swagger UI**: http://localhost:3000/swagger
 - **API Base**: http://localhost:3000
 
 ## 🔗 Endpoints Principais
 
-### Autenticação
+### Usuários
 
 - `POST /auth/register` - Registrar usuário
 - `POST /auth/login` - Login
+- `GET /users` - Listar usuários (admin)
+- `GET /users/:id` - Buscar usuário específico
+- `PATCH /users/:id` - Atualizar usuário
+- `DELETE /users/:id` - Remover usuário
 
 ### Quadras
 
@@ -140,8 +144,10 @@ Após executar a aplicação, acesse:
 - ✅ **Controle de acesso**: Usuários só editam suas próprias reservas
 - ✅ **Status de reservas**: PENDING, CONFIRMED, CANCELLED
 - ✅ **Relacionamentos**: Quadras ↔ Reservas ↔ Usuários
+- ✅ **Validação de email único**: Previne duplicação de usuários
+- ✅ **Interface otimizada**: AuthenticatedUser simplificada (removido userId redundante)
 - ✅ **Documentação automática**: Swagger/OpenAPI
-- ✅ **Cobertura de testes**: 88.59% com 182 testes
+- ✅ **Cobertura de testes**: 88.19% com 179 testes (23 suites)
 
 ## 🛠️ Troubleshooting
 
@@ -169,13 +175,29 @@ Error: password authentication failed for user "postgres"
 
 **Solução**: Verifique as credenciais no arquivo `.env` e reconfigure o usuário PostgreSQL se necessário.
 
-### Erro de TypeORM
+### Erro de TypeORM - Data Type
 
 ```
 DataTypeNotSupportedError: Data type "datetime" not supported
 ```
 
 **Solução**: ✅ **Já corrigido!** As entidades agora usam `timestamp` compatível com PostgreSQL.
+
+### Erro de Constraint - userId null
+
+```
+Error: null value in column "userId" of relation "booking" violates not-null constraint
+```
+
+**Solução**: ✅ **Já corrigido!** A autenticação JWT foi corrigida e a interface `AuthenticatedUser` otimizada.
+
+### Erro de Email Duplicado
+
+```
+ConflictException: Email já está em uso
+```
+
+**Solução**: ✅ **Funcionalidade implementada!** O sistema agora valida emails únicos automaticamente.
 
 ## 📞 Suporte
 
@@ -185,3 +207,38 @@ Para problemas ou dúvidas, verifique:
 2. Se o banco está conectado corretamente
 3. Se todas as dependências foram instaladas
 4. Se as variáveis de ambiente estão configuradas
+
+## 🚀 Últimas Atualizações
+
+### v1.1.0 - Refatoração e Melhorias (Julho 2025)
+
+- 🔧 **Refatoração da Interface AuthenticatedUser**: Removida propriedade `userId` redundante, mantendo apenas `id`
+- 🛡️ **Validação de Email Único**: Implementada verificação automática de emails duplicados
+- 🐛 **Correção de Bugs JWT**: Resolvido problema de autenticação que causava userId null
+- 📊 **Cobertura de Testes**: Mantida alta cobertura (88.19%) com 179 testes
+- 🔍 **PostgreSQL**: Compatibilidade total com tipos timestamp
+- ✨ **Código Limpo**: Interface simplificada e código mais maintível
+
+### Estrutura de Dados Atualizada
+
+```typescript
+// Interface AuthenticatedUser (simplificada)
+interface AuthenticatedUser {
+  id: number; // ✅ ID único do usuário
+  email: string; // ✅ Email do usuário
+  role: string; // ✅ Papel (user/admin)
+}
+
+// Entidade Booking (PostgreSQL compatível)
+@Entity()
+export class Booking {
+  @Column({ type: 'timestamp' }) // ✅ Compatível com PostgreSQL
+  startTime: Date;
+
+  @Column({ type: 'timestamp' }) // ✅ Compatível com PostgreSQL
+  endTime: Date;
+
+  @Column({ type: 'decimal', precision: 3, scale: 1 })
+  duration: number; // ✅ Suporte a 0.5, 1.0, 1.5 horas
+}
+```
