@@ -2,63 +2,61 @@
 
 ## 📋 Pré-requisitos
 
-1. **Node.js** (versão 18 ou superior)
-2. **PostgreSQL** (versão 12 ou superior)
+1. **Node.js** (versão 22.17.1 ou superior)
+2. **Docker** e **Docker Compose**
 3. **npm** ou **yarn**
+
+**Nota**: O PostgreSQL não precisa ser instalado localmente, pois será executado via Docker.
 
 ## 🚀 Configuração do Banco de Dados
 
-### 1. Instalar PostgreSQL
+### 1. Iniciar PostgreSQL com Docker Compose
 
-**macOS (usando Homebrew):**
+O projeto inclui um arquivo `docker-compose.yml` configurado para executar o PostgreSQL automaticamente:
 
 ```bash
-brew install postgresql
-brew services start postgresql
+# Iniciar o banco de dados PostgreSQL em segundo plano
+docker-compose up -d
 ```
 
-**Ubuntu/Debian:**
+Isso irá:
+
+- Baixar a imagem PostgreSQL 16 (se necessário)
+- Criar o container `court_booking_db`
+- Criar automaticamente o banco `court_booking`
+- Configurar usuário e senha conforme definido no docker-compose.yml
+- Expor o banco na porta 5432
+
+### 2. Verificar se o Banco está Rodando
 
 ```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-```
+# Verificar status dos containers
+docker-compose ps
 
-### 2. Criar o Banco de Dados
-
-```bash
-# Conectar ao PostgreSQL como usuário postgres
-sudo -u postgres psql
-
-# Criar usuário e banco de dados
-CREATE USER postgres WITH PASSWORD 'postgres';
-CREATE DATABASE court_booking OWNER postgres;
-GRANT ALL PRIVILEGES ON DATABASE court_booking TO postgres;
-
-# Sair do psql
-\q
+# Ver logs do banco (opcional)
+docker-compose logs postgres
 ```
 
 ### 3. Configurar Variáveis de Ambiente
 
-Copie o arquivo `.env` e ajuste as configurações conforme necessário:
+Copie o arquivo `.env` e ajuste as configurações para se conectar ao PostgreSQL do Docker:
 
 ```bash
 cp .env .env.local
 ```
 
-Edite o arquivo `.env` com suas configurações:
+Edite o arquivo `.env` com as configurações do Docker Compose:
 
 ```bash
 DB_HOST=localhost
 DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 DB_DATABASE=court_booking
 JWT_SECRET=your_super_secret_jwt_key_here_change_in_production
 ```
+
+**Nota**: As credenciais devem corresponder às definidas no `docker-compose.yml`.
 
 ## 🏗️ Instalação e Execução
 
@@ -186,7 +184,57 @@ Após executar a aplicação, acesse:
 - ✅ **Validação de email único**: Previne duplicação de usuários
 - ✅ **Interface otimizada**: AuthenticatedUser simplificada (removido userId redundante)
 - ✅ **Documentação automática**: Swagger/OpenAPI
-- ✅ **Cobertura de testes**: 88.19% com 179 testes (23 suites)
+- ✅ **Cobertura de testes**: 88.91% com 186 testes (24 suites)
+
+## 🚀 Como Começar
+
+### Quick Start
+
+```bash
+# 1. Clonar o repositório
+git clone <repository-url>
+cd back-agenda
+
+# 2. Instalar dependências
+npm install
+
+# 3. Iniciar banco PostgreSQL com Docker
+docker-compose up -d
+
+# 4. Configurar variáveis de ambiente
+cp .env.example .env
+# Editar .env com as configurações do docker-compose.yml
+
+# 5. Executar a aplicação
+npm run start:dev
+
+# 6. Acessar documentação
+# http://localhost:3000/swagger
+```
+
+### Dados de Teste
+
+Para facilitar os testes, você pode criar usuários iniciais:
+
+```bash
+# POST /auth/register
+{
+  "name": "Admin User",
+  "email": "admin@test.com",
+  "password": "123456",
+  "phone": "11999999999",
+  "role": "admin"
+}
+
+# POST /auth/register
+{
+  "name": "Regular User",
+  "email": "user@test.com",
+  "password": "123456",
+  "phone": "11888888888",
+  "role": "user"
+}
+```
 
 ## 🛠️ Troubleshooting
 
@@ -196,23 +244,38 @@ Após executar a aplicação, acesse:
 Error: connect ECONNREFUSED 127.0.0.1:5432
 ```
 
-**Solução**: Verifique se o PostgreSQL está rodando:
+**Solução**: Verifique se o PostgreSQL está rodando via Docker:
 
 ```bash
-# macOS
-brew services restart postgresql
+# Verificar status do container
+docker-compose ps
 
-# Linux
-sudo systemctl restart postgresql
+# Reiniciar o banco se necessário
+docker-compose restart postgres
+
+# Ou parar e iniciar novamente
+docker-compose down
+docker-compose up -d
 ```
 
 ### Erro de Autenticação
 
 ```
-Error: password authentication failed for user "postgres"
+Error: password authentication failed for user "your_username"
 ```
 
-**Solução**: Verifique as credenciais no arquivo `.env` e reconfigure o usuário PostgreSQL se necessário.
+**Solução**: Verifique se as credenciais no arquivo `.env` correspondem às definidas no `docker-compose.yml`.
+
+### Container PostgreSQL não Inicia
+
+```bash
+# Ver logs detalhados do container
+docker-compose logs postgres
+
+# Remover volumes e recriar (CUIDADO: apaga dados)
+docker-compose down -v
+docker-compose up -d
+```
 
 ### Erro de TypeORM - Data Type
 
@@ -252,13 +315,16 @@ Para problemas ou dúvidas, verifique:
 ### v1.1.0 - Refatoração e Melhorias (Julho 2025)
 
 - 🔧 **Refatoração da Interface AuthenticatedUser**: Removida propriedade `userId` redundante, mantendo apenas `id`
-- 🛡️ **Validação de Email Único**: Implementada verificação automática de emails duplicados
+- 🛡️ **Validação de Email Único**: Implementada verificação automática de emails duplicados com ConflictException
 - 🐛 **Correção de Bugs JWT**: Resolvido problema de autenticação que causava userId null
-- 📊 **Cobertura de Testes**: Mantida alta cobertura (88.19%) com 179 testes
-- 🔍 **PostgreSQL**: Compatibilidade total com tipos timestamp
+- 📊 **Cobertura de Testes**: Aumentada para 88.91% com 186 testes em 24 suites
+- 🔍 **PostgreSQL**: Compatibilidade total com tipos timestamp e decimal
 - ✨ **Código Limpo**: Interface simplificada e código mais maintível
 - 📚 **Swagger Atualizado**: Schemas de API atualizados com a nova estrutura de dados
 - 🏷️ **DTOs Aprimorados**: Criados novos DTOs para respostas (AuthenticatedUserDto, LoginResponseDto, UserResponseDto)
+- 🧪 **Testes Completos**: Adicionado teste para user-response.dto.spec.ts
+- 🔧 **ESLint**: Corrigidos todos os warnings de unsafe types e variáveis não utilizadas
+- 🐳 **Docker Compose**: Configuração simplificada do PostgreSQL via container
 
 ### Estrutura de Dados Atualizada
 
@@ -283,3 +349,58 @@ export class Booking {
   duration: number; // ✅ Suporte a 0.5, 1.0, 1.5 horas
 }
 ```
+
+## 🏗️ Arquitetura do Projeto
+
+### Stack Tecnológica
+
+- **Backend**: NestJS com TypeScript
+- **Banco de Dados**: PostgreSQL (via Docker Compose)
+- **ORM**: TypeORM
+- **Autenticação**: JWT (JSON Web Tokens)
+- **Documentação**: Swagger/OpenAPI
+- **Testes**: Jest (unitários e integração)
+- **Validação**: class-validator e class-transformer
+- **Containerização**: Docker e Docker Compose
+
+### Estrutura de Diretórios
+
+```
+src/
+├── auth/                    # Módulo de autenticação
+│   ├── dto/                # DTOs para autenticação
+│   ├── interfaces/         # Interfaces TypeScript
+│   ├── auth.controller.ts  # Controller de auth
+│   ├── auth.service.ts     # Lógica de autenticação
+│   ├── jwt.strategy.ts     # Estratégia JWT
+│   └── roles.guard.ts      # Guard de autorização
+├── users/                  # Módulo de usuários
+│   ├── dto/               # DTOs de usuários
+│   ├── users.controller.ts # Controller de usuários
+│   └── users.service.ts   # Lógica de usuários
+├── courts/                # Módulo de quadras
+├── bookings/              # Módulo de agendamentos
+├── entities/              # Entidades TypeORM
+│   ├── user.entity.ts
+│   ├── court.entity.ts
+│   └── booking.entity.ts
+└── main.ts               # Ponto de entrada da aplicação
+```
+
+### Fluxo de Autenticação
+
+1. **Registro**: `POST /auth/register` - Cria novo usuário com senha hasheada
+2. **Login**: `POST /auth/login` - Valida credenciais e retorna JWT
+3. **Proteção**: Rotas protegidas validam JWT via `JwtAuthGuard`
+4. **Autorização**: `RolesGuard` controla acesso baseado em roles
+
+### Regras de Negócio
+
+- **Usuários**: Email único, senhas hasheadas com bcryptjs
+- **Quadras**: Múltiplas quadras disponíveis para agendamento
+- **Agendamentos**:
+  - Duração flexível (0.5h, 1h, 1.5h, etc.)
+  - Detecção automática de conflitos de horário
+  - Status: pending, confirmed, cancelled
+  - Usuários só podem editar seus próprios agendamentos
+  - Admins podem gerenciar todos os agendamentos
