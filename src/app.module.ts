@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CourtsModule } from './courts/courts.module';
+import { BookingsModule } from './bookings/bookings.module';
 import { User } from './entities/user.entity';
 import { Court } from './entities/court.entity';
 import { Booking } from './entities/booking.entity';
@@ -30,6 +31,7 @@ import { Booking } from './entities/booking.entity';
     AuthModule,
     UsersModule,
     CourtsModule,
+    BookingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

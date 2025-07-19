@@ -13,6 +13,10 @@ describe('CourtsController', () => {
   const mockCourt: Court = {
     id: 1,
     name: 'Quadra de Tênis 1',
+    description: 'Quadra de tênis com piso sintético',
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+    bookings: [],
   };
 
   const mockCourtsService = {

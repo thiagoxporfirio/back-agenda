@@ -70,6 +70,7 @@ describe('JwtStrategy', () => {
       const result = strategy.validate(payload);
 
       expect(result).toEqual({
+        id: 1,
         userId: 1,
         email: 'test@example.com',
         role: 'user',
@@ -86,6 +87,7 @@ describe('JwtStrategy', () => {
       const result = strategy.validate(payload);
 
       expect(result).toEqual({
+        id: 2,
         userId: 2,
         email: 'admin@example.com',
         role: 'admin',

@@ -26,21 +26,18 @@ export class UsersService {
       role: createUserDto.role || 'user',
     });
     const saved = await this.usersRepository.save(user);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = saved;
     return result;
   }
 
   async findAll(): Promise<Omit<User, 'password'>[]> {
     const users = await this.usersRepository.find();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return users.map(({ password, ...rest }) => rest);
   }
 
   async findOne(id: number): Promise<Omit<User, 'password'> | undefined> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('Usuário não encontrado');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;
     return result;
   }
@@ -67,7 +64,6 @@ export class UsersService {
     }
     Object.assign(user, dto);
     const saved = await this.usersRepository.save(user);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = saved;
     return result;
   }

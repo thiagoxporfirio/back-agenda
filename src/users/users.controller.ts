@@ -130,7 +130,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async findOne(@Param('id') id: string, @Request() req: RequestWithUser) {
     // Permite admin ou o próprio usuário
-    if (req.user.role !== 'admin' && req.user.userId !== +id) {
+    if (req.user.role !== 'admin' && req.user.id !== +id) {
       throw new ForbiddenException('Acesso negado');
     }
     return this.usersService.findOne(+id);
