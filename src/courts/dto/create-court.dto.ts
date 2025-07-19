@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCourtDto {
@@ -18,6 +18,7 @@ export class CreateCourtDto {
     required: false,
     maxLength: 500,
   })
+  @IsOptional()
   @IsString()
   @MaxLength(500)
   description?: string;
